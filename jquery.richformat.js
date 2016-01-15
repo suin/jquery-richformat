@@ -1,22 +1,21 @@
 (function($) {
-  function addPlugin(plugin) {
-    $.fn[plugin.name] = function(runtimeOption) {
-      var option = $.extend(plugin.option, runtimeOption);
-      return this.each(function() {
-        plugin.main.bind(this)(option);
-      });
-    };
-  }
-
-  addPlugin({
-    name: "richformat",
-    option: {
+  var Plugin = function(elem, options) {
+    this.options = options;
+    this.elem = elem;
+  };
+  Plugin.prototype = {
+    defaults: {
       format: function(value) {
         return value;
       },
       style: {}
     },
-    main: function(option) {
+    init: function() {
+      this.config = $.extend({}, this.defaults, this.options);
+      this.run();
+      return this;
+    },
+    run: function() {
       var styles = {
         wrapper: {
           position: "relative",
@@ -28,7 +27,7 @@
           cursor: "text"
         }
       };
-      var input = $(this);
+      var input = $(this.elem);
       var inputTextHeight = input.height();
       var inputTextWidth = input.width();
       var inputBoxHeight = input.outerHeight();
@@ -53,7 +52,7 @@
           color: inputColor,
           textAlign: inputTextAlign
         })
-        .css(option.style)
+        .css(this.config.style)
         .on("click", function() {
           input.focus();
         });
@@ -68,10 +67,10 @@
           input.select();
         });
       var changeRichValue = function(value) {
-        var richValue = option.format(value);
+        var richValue = this.config.format(value);
         var method = $.type(richValue) === "object" ? "html" : "text";
         overlay[method](richValue);
-      }
+      }.bind(this);
 
       input
         .wrap(wrapper)
@@ -88,5 +87,11 @@
 
       changeRichValue(input.val());
     }
-  });
+  };
+
+  $.fn.richformat = function(options) {
+    return this.each(function() {
+      new Plugin(this, options).init();
+    });
+  };
 })(jQuery);
