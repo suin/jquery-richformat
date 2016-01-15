@@ -1,0 +1,1 @@
+# jQuery rich format plugin
