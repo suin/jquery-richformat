@@ -24,7 +24,8 @@
         },
         overlay: {
           position: "absolute",
-          cursor: "text"
+          cursor: "text",
+          zIndex: 1
         }
       };
       var input = $(this.elem);
